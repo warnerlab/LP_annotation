@@ -326,3 +326,85 @@ cp /opt/WQ-MAKER_example_data/worker-launch.yml .
   - name : Execute the script
     shell : /opt/cctools/bin/work_queue_worker -N wq_maker1_${USER} -s /home/${USER} --cores all --debug-rotate-max=0 -d all -o /home/${USER}/worker.dbg
 
+nohup ansible-playbook -u ${USER} -i maker-hosts worker-launch.yml > log_file_2.txt 2>&1 &
+
+#annotation failed because I didn't have snoscan file.
+#trying again with just the last contig:
+#In MASTER instance m1.medium
+sudo chown -hR $USER /vol_b
+sudo chgrp -hR $USER /vol_b
+cd /vol_b
+mkdir wq_maker_run
+cd wq_maker_run
+
+mkdir data
+cd data
+#get data
+wget https://de.cyverse.org/dl/d/9B78EAE0-FD47-4CD8-B5E1-30284591498B/lytechinus_pictus_30Nov2018_OWxax.fasta
+wget https://de.cyverse.org/dl/d/419D177C-3778-4C54-915E-3EF32B20724E/lp_hic_repeats.fa
+wget https://de.cyverse.org/dl/d/CFD6227C-7240-4E67-8EA3-E03DDA22E556/Lv_Sp_proteins.fa
+wget https://de.cyverse.org/dl/d/29AD1DB2-77B1-4056-A837-2BAAB4B4008F/LP_stringtie_transcripts.fasta
+
+awk '/Scaffold_62804;HRSCAF=67051/{flag=1;print $0;next}/^>/{flag=0}flag' ~/lytechinus_pictus_30Nov2018_OWxax.fasta >>test.fa
+cd ..
+
+maker -CTL
+rm maker_opts.ctl
+curl https://raw.githubusercontent.com/warnerlab/LP_annotation/master/MAKER%20run/maker_opts.ctl > maker_opts.ctl
+#changed genome to test.fa
+
+nohup wq_maker -contigs-per-split 1 -cores 1 -memory 2048 -disk 4096 -N wq_maker1_${USER} -d all -o master.dbg -debug_size_limit=0 -stats maker_out_stats.txt > log_file.txt 2>&1 &
+touch ~/.ansible.cfg
+echo "[defaults]" >> ~/.ansible.cfg
+echo "host_key_checking = False" >> ~/.ansible.cfg
+
+cp /opt/WQ-MAKER_example_data/maker-hosts .
+# changed hosts file!
+cp /opt/WQ-MAKER_example_data/worker-launch.yml .
+#changed work-launch.yml!
+
+nohup ansible-playbook -u ${USER} -i maker-hosts worker-launch.yml > log_file_2.txt 2>&1 &
+
+
+### Ok here's a real run:
+sudo chown -hR $USER /vol_b
+sudo chgrp -hR $USER /vol_b
+cd /vol_b
+mkdir wq_maker_run
+cd wq_maker_run
+
+mkdir data
+cd data
+#get data
+wget https://de.cyverse.org/dl/d/9B78EAE0-FD47-4CD8-B5E1-30284591498B/lytechinus_pictus_30Nov2018_OWxax.fasta
+wget https://de.cyverse.org/dl/d/419D177C-3778-4C54-915E-3EF32B20724E/lp_hic_repeats.fa
+wget https://de.cyverse.org/dl/d/CFD6227C-7240-4E67-8EA3-E03DDA22E556/Lv_Sp_proteins.fa
+wget https://de.cyverse.org/dl/d/29AD1DB2-77B1-4056-A837-2BAAB4B4008F/LP_stringtie_transcripts.fasta
+
+cd ..
+
+maker -CTL
+rm maker_opts.ctl
+curl https://raw.githubusercontent.com/warnerlab/LP_annotation/master/MAKER%20run/maker_opts.ctl > maker_opts.ctl
+
+nohup wq_maker -contigs-per-split 1 -cores 1 -memory 2048 -disk 4096 -N wq_maker1_${USER} -d all -o master.dbg -debug_size_limit=0 -stats maker_out_stats.txt > log_file.txt 2>&1 &
+touch ~/.ansible.cfg
+echo "[defaults]" >> ~/.ansible.cfg
+echo "host_key_checking = False" >> ~/.ansible.cfg
+touch maker-hosts
+echo "[workers]" >> maker-hosts
+echo "129.114.104.157" >> maker-hosts
+echo "129.114.104.121" >> maker-hosts
+echo "129.114.104.199" >> maker-hosts
+echo "149.165.169.67" >> maker-hosts
+echo "149.165.168.163" >> maker-hosts
+echo "149.165.169.73" >> maker-hosts
+echo "149.165.169.56" >> maker-hosts
+echo "149.165.168.138" >> maker-hosts
+echo "149.165.169.103" >> maker-hosts
+echo "149.165.169.93" >> maker-hosts
+echo "129.114.104.192" >> maker-hosts
+echo "129.114.104.30" >> maker-hosts
+
+curl https://raw.githubusercontent.com/warnerlab/LP_annotation/master/MAKER%20run/worker-launch.yml > worker-launch.yml
+
