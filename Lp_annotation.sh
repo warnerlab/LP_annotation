@@ -393,5 +393,7 @@ curl https://raw.githubusercontent.com/warnerlab/LP_annotation/master/MAKER%20ru
 nohup wq_maker -contigs-per-split 1 -cores 1 -memory 2048 -disk 4096 -N wq_maker1_${USER} -d all -o master.dbg -debug_size_limit=0 -stats maker_out_stats.txt > log_file.txt 2>&1 &
 
 #in each worker:
+nohup work_queue_worker -N wq_maker1_${USER} --cores all --debug-rotate-max=0 -d all -o worker.dbg > log_file_2.txt 2>&1 &
+work_queue_status -M wq_maker1_${USER}
 
 nohup gff3_merge -n -d lytechinus_pictus_30Nov2018_OWxax.maker.output/lytechinus_pictus_30Nov2018_OWxax_master_datastore_index.log &
