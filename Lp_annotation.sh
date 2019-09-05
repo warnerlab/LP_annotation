@@ -367,6 +367,9 @@ nohup ansible-playbook -u ${USER} -i maker-hosts worker-launch.yml > log_file_2.
 
 
 ### Ok here's a real run:
+ssh-keygen
+cat ~/.ssh/id_rsa.pub
+
 sudo chown -hR $USER /vol_b
 sudo chgrp -hR $USER /vol_b
 cd /vol_b
@@ -376,7 +379,7 @@ cd wq_maker_run
 mkdir data
 cd data
 #get data
-wget https://de.cyverse.org/dl/d/9B78EAE0-FD47-4CD8-B5E1-30284591498B/lytechinus_pictus_30Nov2018_OWxax.fasta
+wget https://de.cyverse.org/dl/d/15182853-7732-479B-8832-43159FAF02B5/lytp.transcriptome.nucseq.fasta
 wget https://de.cyverse.org/dl/d/419D177C-3778-4C54-915E-3EF32B20724E/lp_hic_repeats.fa
 wget https://de.cyverse.org/dl/d/CFD6227C-7240-4E67-8EA3-E03DDA22E556/Lv_Sp_proteins.fa
 wget https://de.cyverse.org/dl/d/29AD1DB2-77B1-4056-A837-2BAAB4B4008F/LP_stringtie_transcripts.fasta
@@ -388,23 +391,7 @@ rm maker_opts.ctl
 curl https://raw.githubusercontent.com/warnerlab/LP_annotation/master/MAKER%20run/maker_opts.ctl > maker_opts.ctl
 
 nohup wq_maker -contigs-per-split 1 -cores 1 -memory 2048 -disk 4096 -N wq_maker1_${USER} -d all -o master.dbg -debug_size_limit=0 -stats maker_out_stats.txt > log_file.txt 2>&1 &
-touch ~/.ansible.cfg
-echo "[defaults]" >> ~/.ansible.cfg
-echo "host_key_checking = False" >> ~/.ansible.cfg
-touch maker-hosts
-echo "[workers]" >> maker-hosts
-echo "129.114.104.157" >> maker-hosts
-echo "129.114.104.121" >> maker-hosts
-echo "129.114.104.199" >> maker-hosts
-echo "149.165.169.67" >> maker-hosts
-echo "149.165.168.163" >> maker-hosts
-echo "149.165.169.73" >> maker-hosts
-echo "149.165.169.56" >> maker-hosts
-echo "149.165.168.138" >> maker-hosts
-echo "149.165.169.103" >> maker-hosts
-echo "149.165.169.93" >> maker-hosts
-echo "129.114.104.192" >> maker-hosts
-echo "129.114.104.30" >> maker-hosts
 
-curl https://raw.githubusercontent.com/warnerlab/LP_annotation/master/MAKER%20run/worker-launch.yml > worker-launch.yml
+#in each worker:
 
+nohup gff3_merge -n -d lytechinus_pictus_30Nov2018_OWxax.maker.output/lytechinus_pictus_30Nov2018_OWxax_master_datastore_index.log &
