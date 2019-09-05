@@ -1,5 +1,5 @@
 #-----Genome (these are always required)
-genome=./data/lytechinus_pictus_30Nov2018_OWxax.fasta  #genome sequence (fasta file or fasta embeded in GFF3 file)
+genome=./data/lytechinus_pictus_30Nov2018_OWxax.fasta #genome sequence (fasta file or fasta embeded in GFF3 file)
 organism_type=eukaryotic #eukaryotic or prokaryotic. Default is eukaryotic
 
 #-----Re-annotation Using MAKER Derived GFF3
