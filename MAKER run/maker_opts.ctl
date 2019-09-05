@@ -13,7 +13,7 @@ pred_pass=0 #use ab-initio predictions in maker_gff: 1 = yes, 0 = no
 other_pass=0 #passthrough anyything else in maker_gff: 1 = yes, 0 = no
 
 #-----EST Evidence (for best results provide a file for at least one)
-est=./data/lytp.transcriptome.nucseq.fasta #set of ESTs or assembled mRNA-seq in fasta format
+est=./data/LP_stringtie_transcripts.fasta #set of ESTs or assembled mRNA-seq in fasta format
 altest= #EST/cDNA sequence file in fasta format from an alternate organism
 est_gff= #aligned ESTs or mRNA-seq from an external GFF3 file
 altest_gff= #aligned ESTs from a closly relate species in GFF3 format
