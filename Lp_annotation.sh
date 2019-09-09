@@ -396,4 +396,93 @@ nohup wq_maker -contigs-per-split 1 -cores 1 -memory 2048 -disk 4096 -N wq_maker
 nohup work_queue_worker -N wq_maker1_${USER} --cores all --debug-rotate-max=0 -d all -o worker.dbg > log_file_2.txt 2>&1 &
 work_queue_status -M wq_maker1_${USER}
 
-nohup gff3_merge -n -d lytechinus_pictus_30Nov2018_OWxax.maker.output/lytechinus_pictus_30Nov2018_OWxax_master_datastore_index.log &
+
+#make output foloder
+mkdir round1_results
+
+#merge the outputs
+nohup gff3_merge -n -s -d lytechinus_pictus_30Nov2018_OWxax.maker.output/lytechinus_pictus_30Nov2018_OWxax_master_datastore_index.log > round1_results/lytechinus_pictus.all.noseq.gff &
+nohup fasta_merge -d lytechinus_pictus_30Nov2018_OWxax.maker.output/lytechinus_pictus_30Nov2018_OWxax_master_datastore_index.log &
+nohup gff3_merge -s -d lytechinus_pictus_30Nov2018_OWxax.maker.output/lytechinus_pictus_30Nov2018_OWxax_master_datastore_index.log > round1_results/lytechinus_pictus.all.gff &
+
+mv lytechinus_pictus_30Nov2018_OWxax.all.maker.proteins.fasta round1_results/lytechinus_pictus.all.maker.proteins.fasta
+mv lytechinus_pictus_30Nov2018_OWxax.all.maker.transcripts.fasta round1_results/lytechinus_pictus.all.maker.transcripts.fasta
+mv lytechinus_pictus_30Nov2018_OWxax.all.maker.trnascan.transcripts.fasta round1_results/lytechinus_pictus.all.maker.trnascan.transcripts.fasta
+
+#count the gene models from round 1
+cat round1_results/lytechinus_pictus.all.gff  | awk '{ if ($3 == "gene") print $0 }' | awk '{ sum += ($5 - $4) } END { print NR, sum / NR }'
+# 78275 2978.6
+awk '{print $3}' round1_results/lytechinus_pictus.all.gff | sort | uniq -c
+
+# 21189798 
+#  201671 CDS
+#   61299 contig
+#  218324 exon
+#  772492 expressed_sequence_match
+#   20774 five_prime_UTR
+#   78275 gene
+# 1135763 match
+# 7756174 match_part
+#   53117 mRNA
+# 1095335 protein_match
+#   12988 three_prime_UTR
+#   27713 tRNA
+
+grep "^>" round1_results/lytechinus_pictus.all.maker.proteins.fasta | wc -l
+# 53117
+grep "^>" round1_results/lytechinus_pictus.all.maker.transcripts.fasta | wc -l
+# 53117
+
+#visualize AED
+curl https://raw.githubusercontent.com/mscampbell/Genome_annotation/master/AED_cdf_generator.pl > AED_cdf_generator.pl 
+perl AED_cdf_generator.pl -b 0.025 lytechinus_pictus_30Nov2018_OWxax.all.gff > round1_results/AED_round1_txt
+
+### TRAINING SNAP
+mkdir snap
+cd snap
+mkdir round1
+cd round1
+#export zff just those with AED > 0.25 and longer than 50 AA
+maker2zff -x 0.25 -l 50 -d ../../lytechinus_pictus_30Nov2018_OWxax.maker.output/lytechinus_pictus_30Nov2018_OWxax_master_datastore_index.log &
+rename 's/genome/Lp_rnd1.zff.length50_aed0.25/g' *
+
+# gather some stats and validate
+fathom Lp_rnd1.zff.length50_aed0.25.ann Lp_rnd1.zff.length50_aed0.25.dna -gene-stats > gene-stats.log 2>&1 &
+cat gene-stats.log
+
+# MODEL31497 skipped due to errors
+# 2834 sequences
+# 0.363203 avg GC fraction (min=0.277724 max=0.498339)
+# 15991 genes (plus=7917 minus=8074)
+# 743 (0.046464) single-exon
+# 15248 (0.953536) multi-exon
+# 179.024094 mean exon (min=1 max=12686)
+# 1283.358154 mean intron (min=20 max=23248)
+
+fathom Lp_rnd1.zff.length50_aed0.25.ann Lp_rnd1.zff.length50_aed0.25.dna -validate > validate.log 2>&1 &
+# collect the training sequences and annotations, plus 1000 surrounding bp for training
+fathom Lp_rnd1.zff.length50_aed0.25.ann Lp_rnd1.zff.length50_aed0.25.dna -categorize 1000 > categorize.log 2>&1 &
+fathom uni.ann uni.dna -export 1000 -plus > uni-plus.log 2>&1 &
+# create the training parameters
+mkdir params
+cd params
+forge ../export.ann ../export.dna > ../forge.log 2>&1 &
+cd ..
+# assembly the HMM
+hmm-assembler.pl Lp_rnd1.zff.length50_aed0.25 params > Lp_rnd1.zff.length50_aed0.25.hmm
+
+cd ../..
+
+
+## TRAINING AUGUSTUS
+nohup awk -v OFS="\t" '{ if ($3 == "mRNA") print $1, $4, $5 }' round1_results/lytechinus_pictus.all.noseq.gff | \
+  awk -v OFS="\t" '{ if ($2 < 1000) print $1, "0", $3+1000; else print $1, $2-1000, $3+1000 }' | \
+  bedtools getfasta -fi data/lytechinus_pictus_30Nov2018_OWxax.fasta -bed - -fo round1_results/Lp.all.maker.transcripts1000.fasta &
+
+#MOVED AUGUSTUS CONFIG
+export AUGUSTUS_CONFIG_PATH="/home/scijake/busco/augustus_config/config/"
+
+nohup python /home/scijake/busco/scripts/run_BUSCO.py \
+-i ../round1_results/Lp.all.maker.transcripts1000.fasta -o Lp_rnd1_maker -l /home/scijake/busco/metazoa_odb9/ \
+-m genome -c 9 --long -sp zebrafish -z --augustus_parameters='--progress=true' > busco.log 2>&1 &
+

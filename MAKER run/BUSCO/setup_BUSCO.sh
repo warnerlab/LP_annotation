@@ -15,3 +15,15 @@ tar xvf hmmer.tar.gz
 cd hmmer
 ./configure
 make
+
+cd ..
+cd busco/config
+curl https://raw.githubusercontent.com/warnerlab/LP_annotation/master/MAKER%20run/BUSCO/config.ini > config.ini
+
+sudo apt-get install libparallel-forkmanager-perl
+
+cd ..
+mkdir augustus_config
+
+cp -r /home/scijake/busco/augustus_config
+export AUGUSTUS_CONFIG_PATH="/home/scijake/busco/augustus_config/config/"
