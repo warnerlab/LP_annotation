@@ -527,11 +527,11 @@ cat run_Lp_stringtie/short_summary_Lp_stringtie.txt
 # 978Total BUSCO groups searched
 
 nohup python /home/scijake/busco/scripts/run_BUSCO.py \
-# -i ../round1_results/lytechinus_pictus.all.maker.transcripts.fasta -o Lp_rnd1_maker_transcripts -l /home/scijake/busco/metazoa_odb9/ \
-# -m genome -c 9 -sp zebrafish -z --augustus_parameters='--progress=true' > busco.log 2>&1 &
+ -i ../round1_results/lytechinus_pictus.all.maker.transcripts.fasta -o Lp_rnd1_maker_transcripts -l /home/scijake/busco/metazoa_odb9/ \
+ -m genome -c 9 -sp zebrafish -z --augustus_parameters='--progress=true' > busco.log 2>&1 &
 
-# cp Lytechinus_pictus* /vol_b/wqmaker/augustus/config/species/Lytechinus_pictus
-# cat run_Lp_rnd1_maker_transcripts/short_summary_Lp_rnd1_maker_transcripts.txt 
+
+cat run_Lp_rnd1_maker_transcripts/short_summary_Lp_rnd1_maker_transcripts.txt 
 # # BUSCO version is: 3.1.0 
 # # The lineage dataset is: metazoa_odb9 (Creation date: 2016-02-13, number of species: 65, number of BUSCOs: 978)
 # # To reproduce this run: python /home/scijake/busco/scripts/run_BUSCO.py -i ../round1_results/lytechinus_pictus.all.maker.transcripts.fasta -o Lp_rnd1_maker_transcripts -l /home/scijake/busco/metazoa_odb9/ -m genome -c 9 -z -sp zebrafish --augustus_parameters '--progress=true'
@@ -552,12 +552,31 @@ nohup python /home/scijake/busco/scripts/run_BUSCO.py \
 -i ../data/lytechinus_pictus_30Nov2018_OWxax.fasta -o Lp_genome -l /home/scijake/busco/metazoa_odb9/ \
 -m genome -c 9 -sp zebrafish -z --augustus_parameters='--progress=true' > busco.log 2>&1 &
 
+cat buscos/run_Lp_genome/short_summary_Lp_genome.txt 
+# BUSCO version is: 3.1.0 
+# The lineage dataset is: metazoa_odb9 (Creation date: 2016-02-13, number of species: 65, number of BUSCOs: 978)
+# To reproduce this run: python /home/scijake/busco/scripts/run_BUSCO.py -i ../data/lytechinus_pictus_30Nov2018_OWxax.fasta -o Lp_genome -l /home/scijake/busco/metazoa_odb9/ -m genome -c 9 -z -sp zebrafish --augustus_parameters '--progress=true'
+#
+# Summarized benchmarking in BUSCO notation for file ../data/lytechinus_pictus_30Nov2018_OWxax.fasta
+# BUSCO was run in mode: genome
+
+# C:87.5%[S:70.4%,D:17.1%],F:4.3%,M:8.2%,n:978
+
+# 856Complete BUSCOs (C)
+# 689Complete and single-copy BUSCOs (S)
+# 167Complete and duplicated BUSCOs (D)
+# 42Fragmented BUSCOs (F)
+# 80Missing BUSCOs (M)
+# 978Total BUSCO groups searched
 
 #moving on...
+#rename the training files to useful
 cd /vol_b/wqmaker/augustus/run_Lp_rnd1_maker/augustus_output/retraining_parameters
 rename 's/BUSCO_Lp_rnd1_maker_3330639781/Lytechinus_pictus/g' *
 sed -i 's/BUSCO_Lp_rnd1_maker_3330639781/Lytechinus_pictus/g' Lytechinus_pictus_parameters.cfg
 sed -i 's/BUSCO_Lp_rnd1_maker_3330639781/Lytechinus_pictus/g' Lytechinus_pictus_parameters.cfg.orig1
+
+cp Lytechinus_pictus* /vol_b/wqmaker/augustus/config/species/Lytechinus_pictus
 
 #moving this back home
 cp -r /home/scijake/busco/augustus_config/config /vol_b/wqmaker/augustus/
@@ -575,4 +594,13 @@ awk '{ if ($2 == "est2genome") print $0 }' lytechinus_pictus.all.noseq.gff > lyt
 awk '{ if ($2 == "protein2genome") print $0 }' lytechinus_pictus.all.noseq.gff > lytechinus_pictus_rnd1.all.maker.protein2genome.gff
 # repeat alignments
 awk '{ if ($2 ~ "repeat") print $0 }' lytechinus_pictus.all.noseq.gff > lytechinus_pictus_rnd1.all.maker.repeats.gff
+
+
+export AUGUSTUS_CONFIG_PATH="/vol_b/wqmaker/augustus/config/"
+#just covering my ass
+sudo cp -r augustus/config/species/Lytechinus_pictus /opt/augustus/config/species/
+
+curl https://raw.githubusercontent.com/warnerlab/LP_annotation/master/MAKER%20run/maker_opts_rnd2.ctl > maker_opts.ctl
+
+nohup wq_maker -contigs-per-split 1 -cores 1 -memory 2048 -disk 4096 -N wq_maker2_${USER} -d all -o master.dbg -debug_size_limit=0 -stats maker_out_stats.txt > log_file.txt 2>&1 &
 
