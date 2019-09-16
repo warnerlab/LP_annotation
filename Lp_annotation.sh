@@ -597,10 +597,14 @@ awk '{ if ($2 ~ "repeat") print $0 }' lytechinus_pictus.all.noseq.gff > lytechin
 
 
 export AUGUSTUS_CONFIG_PATH="/vol_b/wqmaker/augustus/config/"
-#just covering my ass
-sudo cp -r augustus/config/species/Lytechinus_pictus /opt/augustus/config/species/
+
+#MAKER WANTS THE AUGUSTUS FILE HERE:
+sudo cp -r augustus/config /vol_b/wqmaker/
 
 curl https://raw.githubusercontent.com/warnerlab/LP_annotation/master/MAKER%20run/maker_opts_rnd2.ctl > maker_opts.ctl
 
 nohup wq_maker -contigs-per-split 1 -cores 1 -memory 2048 -disk 4096 -N wq_maker2_${USER} -d all -o master.dbg -debug_size_limit=0 -stats maker_out_stats.txt > log_file.txt 2>&1 &
+
+nohup work_queue_worker -N wq_maker2_${USER} --cores all --debug-rotate-max=0 -d all -o worker.dbg > log_file_2.txt 2>&1 &
+work_queue_status -M wq_maker2_${USER}
 
