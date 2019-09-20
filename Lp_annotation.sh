@@ -205,166 +205,6 @@ grep -c ">" /Users/warnerj/Documents/Warner_lab/Collabs/Lp_annotation/assemblies
 
 #Maker run on ATMOSPHERE
 
-#In MASTER instance m1.medium
-sudo chown -hR $USER /vol_b
-sudo chgrp -hR $USER /vol_b
-cd /vol_b
-mkdir wq_maker_run
-cd wq_maker_run
-
-#get data
-wget https://de.cyverse.org/dl/d/9B78EAE0-FD47-4CD8-B5E1-30284591498B/lytechinus_pictus_30Nov2018_OWxax.fasta
-wget https://de.cyverse.org/dl/d/419D177C-3778-4C54-915E-3EF32B20724E/lp_hic_repeats.fa
-wget https://de.cyverse.org/dl/d/CFD6227C-7240-4E67-8EA3-E03DDA22E556/Lv_Sp_proteins.fa
-wget https://de.cyverse.org/dl/d/29AD1DB2-77B1-4056-A837-2BAAB4B4008F/LP_stringtie_transcripts.fasta
-
-#round one:
-cat maker_opts.ctl
-# #-----Genome (these are always required)
-# genome=./data/lytechinus_pictus_30Nov2018_OWxax.fasta  #genome sequence (fasta file or fasta embeded in GFF3 file)
-# organism_type=eukaryotic #eukaryotic or prokaryotic. Default is eukaryotic
-
-# #-----Re-annotation Using MAKER Derived GFF3
-# maker_gff= #MAKER derived GFF3 file
-# est_pass=0 #use ESTs in maker_gff: 1 = yes, 0 = no
-# altest_pass=0 #use alternate organism ESTs in maker_gff: 1 = yes, 0 = no
-# protein_pass=0 #use protein alignments in maker_gff: 1 = yes, 0 = no
-# rm_pass=0 #use repeats in maker_gff: 1 = yes, 0 = no
-# model_pass=0 #use gene models in maker_gff: 1 = yes, 0 = no
-# pred_pass=0 #use ab-initio predictions in maker_gff: 1 = yes, 0 = no
-# other_pass=0 #passthrough anyything else in maker_gff: 1 = yes, 0 = no
-
-# #-----EST Evidence (for best results provide a file for at least one)
-# est=./data/LP_stringtie_transcripts.fasta #set of ESTs or assembled mRNA-seq in fasta format
-# altest= #EST/cDNA sequence file in fasta format from an alternate organism
-# est_gff= #aligned ESTs or mRNA-seq from an external GFF3 file
-# altest_gff= #aligned ESTs from a closly relate species in GFF3 format
-
-# #-----Protein Homology Evidence (for best results provide a file for at least one)
-# protein=./data/Lv_Sp_proteins.fa  #protein sequence file in fasta format (i.e. from mutiple oransisms)
-# protein_gff=  #aligned protein homology evidence from an external GFF3 file
-
-# #-----Repeat Masking (leave values blank to skip repeat masking)
-# model_org= #select a model organism for RepBase masking in RepeatMasker
-# rmlib=./data/lp_hic_repeats.fa #provide an organism specific repeat library in fasta format for RepeatMasker
-# repeat_protein= #provide a fasta file of transposable element proteins for RepeatRunner
-# rm_gff= #pre-identified repeat elements from an external GFF3 file
-# prok_rm=0 #forces MAKER to repeatmask prokaryotes (no reason to change this), 1 = yes, 0 = no
-# softmask=1 #use soft-masking rather than hard-masking in BLAST (i.e. seg and dust filtering)
-
-# #-----Gene Prediction
-# snaphmm= #SNAP HMM file
-# gmhmm= #GeneMark HMM file
-# augustus_species= #Augustus gene prediction species model
-# fgenesh_par_file= #FGENESH parameter file
-# pred_gff= #ab-initio predictions from an external GFF3 file
-# model_gff= #annotated gene models from an external GFF3 file (annotation pass-through)
-# est2genome=0 #infer gene predictions directly from ESTs, 1 = yes, 0 = no
-# protein2genome=0 #infer predictions from protein homology, 1 = yes, 0 = no
-# trna=1 #find tRNAs with tRNAscan, 1 = yes, 0 = no
-# snoscan_rrna=./test_data/Os-rRNA.fa #rRNA file to have Snoscan find snoRNAs
-# unmask=0 #also run ab-initio prediction programs on unmasked sequence, 1 = yes, 0 = no
-
-# #-----Other Annotation Feature Types (features MAKER doesn't recognize)
-# other_gff= #extra features to pass-through to final MAKER generated GFF3 file
-
-# #-----External Application Behavior Options
-# alt_peptide=C #amino acid used to replace non-standard amino acids in BLAST databases
-# cpus=1 #max number of cpus to use in BLAST and RepeatMasker (not for MPI, leave 1 when using MPI)
-
-# #-----MAKER Behavior Options
-# max_dna_len=100000 #length for dividing up contigs into chunks (increases/decreases memory usage)
-# min_contig=1 #skip genome contigs below this length (under 10kb are often useless)
-
-# pred_flank=200 #flank for extending evidence clusters sent to gene predictors
-# pred_stats=0 #report AED and QI statistics for all predictions as well as models
-# AED_threshold=1 #Maximum Annotation Edit Distance allowed (bound by 0 and 1)
-# min_protein=0 #require at least this many amino acids in predicted proteins
-# alt_splice=0 #Take extra steps to try and find alternative splicing, 1 = yes, 0 = no
-# always_complete=0 #extra steps to force start and stop codons, 1 = yes, 0 = no
-# map_forward=0 #map names and attributes forward from old GFF3 genes, 1 = yes, 0 = no
-# keep_preds=0 #Concordance threshold to add unsupported gene prediction (bound by 0 and 1)
-
-# split_hit=10000 #length for the splitting of hits (expected max intron size for evidence alignments)
-# single_exon=0 #consider single exon EST evidence when generating annotations, 1 = yes, 0 = no
-# single_length=250 #min length required for single exon ESTs if 'single_exon is enabled'
-# correct_est_fusion=0 #limits use of ESTs in annotation to avoid fusion genes
-
-# tries=2 #number of times to try a contig if there is a failure for some reason
-# clean_try=0 #remove all data from previous run before retrying, 1 = yes, 0 = no
-# clean_up=0 #removes theVoid directory with individual analysis files, 1 = yes, 0 = no
-# TMP= #specify a directory other than the system default temporary directory for temporary files
-
-nohup wq_maker -contigs-per-split 5234 -cores 1 -memory 2048 -disk 4096 -N wq_maker1_${USER} -d all -o master.dbg -debug_size_limit=0 -stats test_out_stats.txt > log_file.txt 2>&1 &
-
-#make this:
-cat ~/.ansible.cfg
-[defaults]
-host_key_checking = False
-
-cp /opt/WQ-MAKER_example_data/maker-hosts .
-echo "149.165.168.125" >> maker-hosts
-echo "149.165.168.217" >> maker-hosts
-echo "149.165.169.93" >> maker-hosts
-echo "149.165.168.213" >> maker-hosts
-echo "149.165.169.63" >> maker-hosts
-echo "149.165.168.185" >> maker-hosts
-echo "149.165.168.134" >> maker-hosts
-echo "149.165.168.238" >> maker-hosts
-echo "149.165.169.41" >> maker-hosts
-echo "149.165.168.138" >> maker-hosts
-echo "149.165.168.223" >> maker-hosts
-echo "149.165.168.221" >> maker-hosts
-
-cp /opt/WQ-MAKER_example_data/worker-launch.yml .
----
-- hosts : workers
-  environment:
-    PATH: "{{ ansible_env.PATH }}:/home/upendra/bin:/home/upendra/.local/bin:/opt/icommands:/opt/icommands:/opt/exonerate-2.2.0-x86_64/bin/:/opt/cctools/bin:/opt/ncbi-blast-2.6.0+/bin/:/opt/snoscan-0.9.1/:/opt/tRNAscan-SE-1.3.1/:/opt/snap/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/opt/augustus-3.2.2/bin:/opt/maker/bin:/opt/RepeatMasker:/opt/snap"    
-    PERL5LIB: "/opt/tRNAscan-SE-1.3.1::/opt/cctools/lib/perl5/site_perl"
-  tasks :
-  - name : Execute the script
-    shell : /opt/cctools/bin/work_queue_worker -N wq_maker1_${USER} -s /home/${USER} --cores all --debug-rotate-max=0 -d all -o /home/${USER}/worker.dbg
-
-nohup ansible-playbook -u ${USER} -i maker-hosts worker-launch.yml > log_file_2.txt 2>&1 &
-
-#annotation failed because I didn't have snoscan file.
-#trying again with just the last contig:
-#In MASTER instance m1.medium
-sudo chown -hR $USER /vol_b
-sudo chgrp -hR $USER /vol_b
-cd /vol_b
-mkdir wq_maker_run
-cd wq_maker_run
-
-mkdir data
-cd data
-#get data
-wget https://de.cyverse.org/dl/d/9B78EAE0-FD47-4CD8-B5E1-30284591498B/lytechinus_pictus_30Nov2018_OWxax.fasta
-wget https://de.cyverse.org/dl/d/419D177C-3778-4C54-915E-3EF32B20724E/lp_hic_repeats.fa
-wget https://de.cyverse.org/dl/d/CFD6227C-7240-4E67-8EA3-E03DDA22E556/Lv_Sp_proteins.fa
-wget https://de.cyverse.org/dl/d/29AD1DB2-77B1-4056-A837-2BAAB4B4008F/LP_stringtie_transcripts.fasta
-
-awk '/Scaffold_62804;HRSCAF=67051/{flag=1;print $0;next}/^>/{flag=0}flag' ~/lytechinus_pictus_30Nov2018_OWxax.fasta >>test.fa
-cd ..
-
-maker -CTL
-rm maker_opts.ctl
-curl https://raw.githubusercontent.com/warnerlab/LP_annotation/master/MAKER%20run/maker_opts.ctl > maker_opts.ctl
-#changed genome to test.fa
-
-nohup wq_maker -contigs-per-split 1 -cores 1 -memory 2048 -disk 4096 -N wq_maker1_${USER} -d all -o master.dbg -debug_size_limit=0 -stats maker_out_stats.txt > log_file.txt 2>&1 &
-touch ~/.ansible.cfg
-echo "[defaults]" >> ~/.ansible.cfg
-echo "host_key_checking = False" >> ~/.ansible.cfg
-
-cp /opt/WQ-MAKER_example_data/maker-hosts .
-# changed hosts file!
-cp /opt/WQ-MAKER_example_data/worker-launch.yml .
-#changed work-launch.yml!
-
-nohup ansible-playbook -u ${USER} -i maker-hosts worker-launch.yml > log_file_2.txt 2>&1 &
-
 
 ### Ok here's a real run:
 ssh-keygen
@@ -598,6 +438,13 @@ awk '{ if ($2 ~ "repeat") print $0 }' lytechinus_pictus.all.noseq.gff > lytechin
 
 export AUGUSTUS_CONFIG_PATH="/vol_b/wqmaker/augustus/config/"
 
+####
+#
+# MAKER round 2
+#
+#####
+
+
 #MAKER WANTS THE AUGUSTUS FILE HERE:
 sudo cp -r augustus/config /vol_b/wqmaker/
 
@@ -607,4 +454,162 @@ nohup wq_maker -contigs-per-split 1 -cores 1 -memory 2048 -disk 4096 -N wq_maker
 
 nohup work_queue_worker -N wq_maker2_${USER} --cores all --debug-rotate-max=0 -d all -o worker.dbg > log_file_2.txt 2>&1 &
 work_queue_status -M wq_maker2_${USER}
+
+mkdir round2_results
+
+#merge the outputs
+nohup gff3_merge -n -s -d lytechinus_pictus_30Nov2018_OWxax.maker.output/lytechinus_pictus_30Nov2018_OWxax_master_datastore_index.log > round2_results/lytechinus_pictus.all.noseq.gff &
+nohup fasta_merge -d lytechinus_pictus_30Nov2018_OWxax.maker.output/lytechinus_pictus_30Nov2018_OWxax_master_datastore_index.log &
+nohup gff3_merge -s -d lytechinus_pictus_30Nov2018_OWxax.maker.output/lytechinus_pictus_30Nov2018_OWxax_master_datastore_index.log > round2_results/lytechinus_pictus.all.gff &
+
+mv lytechinus_pictus_30Nov2018_OWxax.all.maker.proteins.fasta round2_results/lytechinus_pictus.all.maker.proteins.fasta
+mv lytechinus_pictus_30Nov2018_OWxax.all.maker.transcripts.fasta round2_results/lytechinus_pictus.all.maker.transcripts.fasta
+mv lytechinus_pictus_30Nov2018_OWxax.all.maker.trnascan.transcripts.fasta round2_results/lytechinus_pictus.all.maker.trnascan.transcripts.fasta
+
+#count the gene models from round 2
+cat round2_results/lytechinus_pictus.all.gff  | awk '{ if ($3 == "gene") print $0 }' | awk '{ sum += ($5 - $4) } END { print NR, sum / NR }'
+# 61709 5807.37
+awk '{print $3}' round2_results/lytechinus_pictus.all.gff | sort | uniq -c
+
+# 22058893 
+#  187238 CDS
+#   61477 contig
+#  224184 exon
+#  432075 expressed_sequence_match
+#   16290 five_prime_UTR
+#   61709 gene
+# 1207759 match
+# 3448006 match_part
+#   33069 mRNA
+#  600296 protein_match
+#   15016 three_prime_UTR
+#   28640 tRNA
+
+grep "^>" round2_results/lytechinus_pictus.all.maker.proteins.fasta | wc -l
+# 33069
+grep "^>" round2_results/lytechinus_pictus.all.maker.transcripts.fasta | wc -l
+# 33069
+
+#visualize AED
+perl AED_cdf_generator.pl -b 0.025 round2_results/lytechinus_pictus.all.gff > round2_results/AED_round2.txt
+
+### TRAINING SNAP
+cd snap
+mkdir round2
+cd round2
+#export zff just those with AED < 0.25 and longer than 50 AA
+maker2zff -x 0.25 -l 50 -d ../../lytechinus_pictus_30Nov2018_OWxax.maker.output/lytechinus_pictus_30Nov2018_OWxax_master_datastore_index.log &
+rename 's/genome/Lp_rnd2.zff.length50_aed0.25/g' *
+
+# gather some stats and validate
+fathom Lp_rnd2.zff.length50_aed0.25.ann Lp_rnd2.zff.length50_aed0.25.dna -gene-stats > gene-stats.log 2>&1 &
+cat gene-stats.log
+
+# MODEL19914 skipped due to errors
+# 2099 sequences
+# 0.361559 avg GC fraction (min=0.297566 max=0.476190)
+# 13576 genes (plus=6768 minus=6808)
+# 218 (0.016058) single-exon
+# 13358 (0.983942) multi-exon
+# 166.917572 mean exon (min=1 max=10900)
+# 1421.189575 mean intron (min=4 max=143458)
+
+fathom Lp_rnd2.zff.length50_aed0.25.ann Lp_rnd2.zff.length50_aed0.25.dna -validate > validate.log 2>&1 &
+# collect the training sequences and annotations, plus 1000 surrounding bp for training
+fathom Lp_rnd2.zff.length50_aed0.25.ann Lp_rnd2.zff.length50_aed0.25.dna -categorize 1000 > categorize.log 2>&1 &
+fathom uni.ann uni.dna -export 1000 -plus > uni-plus.log 2>&1 &
+# create the training parameters
+mkdir params
+cd params
+forge ../export.ann ../export.dna > ../forge.log 2>&1 &
+cd ..
+# assembly the HMM
+hmm-assembler.pl Lp_rnd2.zff.length50_aed0.25 params > Lp_rnd2.zff.length50_aed0.25.hmm
+
+cd ../..
+
+
+## TRAINING AUGUSTUS
+nohup awk -v OFS="\t" '{ if ($3 == "mRNA") print $1, $4, $5 }' round2_results/lytechinus_pictus.all.noseq.gff | \
+  awk -v OFS="\t" '{ if ($2 < 1000) print $1, "0", $3+1000; else print $1, $2-1000, $3+1000 }' | \
+  bedtools getfasta -fi data/lytechinus_pictus_30Nov2018_OWxax.fasta -bed - -fo round2_results/Lp.all.maker.transcripts1000.fasta &
+
+#Using the temporary path, this is going to get confusing
+export AUGUSTUS_CONFIG_PATH="/vol_b/wqmaker/augustus/config/"
+
+nohup python /opt/Busco/scripts/run_BUSCO.py \
+-i ../round2_results/Lp.all.maker.transcripts1000.fasta -o Lp_rnd2_maker -l /opt/Busco/datasets/metazoa_obd9/ \
+-m genome -c 9 --long -sp Lytechinus_pictus -z --augustus_parameters='--progress=true' > busco.log 2>&1 &
+
+cat run_Lp_rnd2_maker/short_summary_Lp_rnd2_maker.txt
+
+# # BUSCO version is: 3.1.0 
+# # The lineage dataset is: metazoa_odb9 (Creation date: 2016-02-13, number of species: 65, number of BUSCOs: 978)
+# # To reproduce this run: python /opt/Busco/scripts/run_BUSCO.py -i ../round2_results/Lp.all.maker.transcripts1000.fasta -o Lp_rnd2_maker -l /opt/Busco/datasets/metazoa_obd9/ -m genome -c 9 --long -z -sp Lytechinus_pictus --augustus_parameters '--progress=true'
+# #
+# # Summarized benchmarking in BUSCO notation for file ../round2_results/Lp.all.maker.transcripts1000.fasta
+# # BUSCO was run in mode: genome
+
+# 	C:77.1%[S:57.8%,D:19.3%],F:7.2%,M:15.7%,n:978
+
+# 	754	Complete BUSCOs (C)
+# 	565	Complete and single-copy BUSCOs (S)
+# 	189	Complete and duplicated BUSCOs (D)
+# 	70	Fragmented BUSCOs (F)
+# 	154	Missing BUSCOs (M)
+#	978	Total BUSCO groups searched
+
+#compare to transcriptome
+nohup python /opt/Busco/scripts/run_BUSCO.py \
+ -i ../round2_results/lytechinus_pictus.all.maker.transcripts.fasta -o Lp_rnd2_maker_transcripts -l /opt/Busco/datasets/metazoa_obd9/ \
+ -m transcriptome -c 9 -sp Lytechinus_pictus -z --augustus_parameters='--progress=true' > busco.log 2>&1 &
+
+# # BUSCO version is: 3.1.0 
+# # The lineage dataset is: metazoa_odb9 (Creation date: 2016-02-13, number of species: 65, number of BUSCOs: 978)
+# # To reproduce this run: python /opt/Busco/scripts/run_BUSCO.py -i ../round2_results/lytechinus_pictus.all.maker.transcripts.fasta -o Lp_rnd2_maker_transcripts -l /opt/Busco/datasets/metazoa_obd9/ -m transcriptome -c 9 -z
+# #
+# # Summarized benchmarking in BUSCO notation for file ../round2_results/lytechinus_pictus.all.maker.transcripts.fasta
+# # BUSCO was run in mode: transcriptome
+
+# 	C:75.2%[S:60.3%,D:14.9%],F:11.9%,M:12.9%,n:978
+
+# 	736	Complete BUSCOs (C)
+# 	590	Complete and single-copy BUSCOs (S)
+# 	146	Complete and duplicated BUSCOs (D)
+# 	116	Fragmented BUSCOs (F)
+# 	126	Missing BUSCOs (M)
+# 	978	Total BUSCO groups searched
+
+cd run_Lp_rnd2_maker/augustus_output/retraining_parameters/
+
+rename 's/BUSCO_Lp_rnd2_maker_3305258666/Lytechinus_pictus/g' *
+sed -i 's/BUSCO_Lp_rnd2_maker_3305258666/Lytechinus_pictus/g' Lytechinus_pictus_parameters.cfg
+sed -i 's/BUSCO_Lp_rnd2_maker_3305258666/Lytechinus_pictus/g' Lytechinus_pictus_parameters.cfg.orig1
+
+#move round 2 file to stash
+cp -r /vol_b/wqmaker/config/species/Lytechinus_pictus /vol_b/wqmaker/augustus/round2_config/species/
+
+cp Lytechinus_pictus* /vol_b/wqmaker/config/species/Lytechinus_pictus/
+
+
+
+###
+#
+#
+# MAKER round 3
+#
+#
+##
+
+
+#trying trinity this time:
+wget https://de.cyverse.org/dl/d/15182853-7732-479B-8832-43159FAF02B5/lytp.transcriptome.nucseq.fasta 
+
+curl https://raw.githubusercontent.com/warnerlab/LP_annotation/master/MAKER%20run/maker_opts_rnd3.ctl > maker_opts.ctl
+
+nohup wq_maker -contigs-per-split 1 -cores 1 -memory 2048 -disk 4096 -N wq_maker3_${USER} -d all -o master.dbg -debug_size_limit=0 -stats maker_out_stats.txt > log_file.txt 2>&1 &
+nohup work_queue_worker -N wq_maker3_${USER} --cores all --debug-rotate-max=0 -d all -o worker.dbg > log_file_2.txt 2>&1 &
+work_queue_status -M wq_maker3_${USER}
+
+
 
